@@ -3,6 +3,7 @@ let password = document.querySelector("#password")! as HTMLInputElement;
 const button = document.querySelector(".login-btn")! as HTMLButtonElement;
 let emailPassError = document.querySelectorAll(".error-message")! ;
 let loader = document.querySelector(".loader-cont")! as HTMLDivElement;
+const hideShow = document.querySelector(".toggle-icon")! as HTMLSpanElement;
 interface userDetails {
     readonly email: string,
     readonly password: string,
@@ -53,6 +54,16 @@ button.addEventListener('click', (e): void => {
         (emailPassError[0] as HTMLSpanElement).style.opacity = "1";
         (emailPassError[1]! as HTMLSpanElement).innerHTML = `Enter valid password`;
         (emailPassError[1] as HTMLSpanElement).style.opacity = "1";
+    }
+    return;
+});
+//Function for hide/show
+hideShow.addEventListener('click', (): void => {
+    if(password.type === "password") {
+        password.type = "text";
+    }
+    else {
+        password.type = "password";
     }
     return;
 });
