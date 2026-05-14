@@ -1,8 +1,8 @@
-let Details = document.querySelectorAll("input");
-let Button = document.querySelector("button");
-let showPassImg = document.querySelectorAll("i");
-let loader = document.querySelector(".loader-cont");
-let spanError = document.querySelectorAll(".spanErr");
+const Details = document.querySelectorAll("input");
+const Button = document.querySelector("button");
+const showPassImg = document.querySelectorAll("i");
+const loader = document.querySelector(".loader-cont");
+const spanError = document.querySelectorAll(".spanErr");
 let show1 = true;
 let show2 = true;
 let tickCheck = false;
@@ -47,6 +47,7 @@ Button.addEventListener("click", () => {
                     usersData.push(user);
                     let strUserData = JSON.stringify(usersData);
                     localStorage.setItem(`usersDetails`, strUserData);
+                    sessionStorage.setItem("loginemail", (Details[1].value).trim());
                     window.location.replace("dashboard.html");
                 }
                 else {
@@ -72,6 +73,7 @@ Button.addEventListener("click", () => {
                         userArray.push(user);
                         let strUserData = JSON.stringify(userArray);
                         localStorage.setItem(`usersDetails`, strUserData);
+                        sessionStorage.setItem("loginemail", (Details[1].value).trim());
                         window.location.replace("dashboard.html");
                     }
                 }
