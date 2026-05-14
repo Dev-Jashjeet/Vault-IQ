@@ -1,21 +1,6 @@
-interface user {
-    readonly name: string,
-    readonly email: string,
-    readonly password: string,
-    readonly salary: number,
-    transactions: transaction[],
-}
-interface transaction {
-    readonly date: string,
-    readonly amount: number,
-    readonly type: "Income"|"Expense",
-}
-interface calData {
-    readonly totalBalance: number,
-    readonly totalIncome: number,
-    readonly totalExpense: number,
-}
-type income = "Income"|"Expense";
+import type { calData, income, transaction } from "./modules";
+import type user from "./modules";
+
 const logoBox = document.querySelector(".logo-box")! as HTMLDivElement;
 const userProfileName = document.querySelectorAll(".userprofile")! ;
 const logoutBtn = document.querySelectorAll(".logout-btn")! ;
