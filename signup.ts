@@ -1,18 +1,13 @@
-let Details = document.querySelectorAll("input")!;
-let Button = document.querySelector("button")! as HTMLButtonElement;
-let showPassImg = document.querySelectorAll("i")!;
-let loader = document.querySelector(".loader-cont")! as HTMLDivElement;
-let spanError = document.querySelectorAll(".spanErr")!;
+import type { userData } from "./modules";
+
+const Details = document.querySelectorAll("input")!;
+const Button = document.querySelector("button")! as HTMLButtonElement;
+const showPassImg = document.querySelectorAll("i")!;
+const loader = document.querySelector(".loader-cont")! as HTMLDivElement;
+const spanError = document.querySelectorAll(".spanErr")!;
 let show1: boolean = true;
 let show2: boolean = true;
 let tickCheck: boolean = false;
-interface userData {
-  readonly name: string;
-  readonly email: string;
-  readonly password: string;
-  readonly salary: number;
-  readonly transactions: Array<object>;
-}
 
 Details[5]!.addEventListener("change", () => {
   if ((Details[5]! as HTMLInputElement).checked) {
@@ -59,6 +54,7 @@ Button.addEventListener("click", (): void => {
           usersData.push(user);
           let strUserData = JSON.stringify(usersData);
           localStorage.setItem(`usersDetails`, strUserData);
+            sessionStorage.setItem("loginemail", (Details[1]!.value).trim());
           window.location.replace("dashboard.html");
         } 
         else {
@@ -87,6 +83,7 @@ Button.addEventListener("click", (): void => {
             userArray.push(user);
             let strUserData = JSON.stringify(userArray);
             localStorage.setItem(`usersDetails`, strUserData);
+            sessionStorage.setItem("loginemail", (Details[1]!.value).trim());
             window.location.replace("dashboard.html");
           }
         }
