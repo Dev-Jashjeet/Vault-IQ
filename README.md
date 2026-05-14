@@ -17,3 +17,4 @@ Personal Finance Manager is a web-based application that helps users efficiently
 *** Charts added and only last step is left
 *** Charts work completed
 *** Module files added for interface
+*** Makes module file of all interfaces
