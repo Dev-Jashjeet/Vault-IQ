@@ -1,9 +1,11 @@
 const logoBox = document.querySelector(".logo-box");
 const userProfileName = document.querySelectorAll(".userprofile");
-const logoutBtn = document.querySelectorAll(".logout-btn");
+const logoutBtn = document.querySelector(".logout-btn");
 const BMESCont = document.querySelectorAll(".BMEScont");
 const transactionBtn = document.querySelector(".add-TransactionBtn");
 const body = document.querySelector("body");
+const profilePic = document.querySelectorAll(".profile-photo-cls");
+const picFile = document.querySelector("#profile-photo");
 let Person; // Main user Object where all calculations take place
 // Function that return Login User object
 function getUserData() {
@@ -16,6 +18,34 @@ function getUserData() {
     }
     throw new Error("User not found");
 }
+// Function to change profile photo and set to local storage (Base64 version)
+picFile.addEventListener("change", () => {
+    const file = picFile.files?.[0];
+    if (!file) {
+        return;
+    }
+    for (let ele of profilePic) {
+        ele.src = "";
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const base64String = e.target?.result;
+        // Set image in UI
+        for (let ele of profilePic) {
+            ele.src = base64String;
+        }
+        // Update Person and localStorage
+        const usersDetails = JSON.parse(localStorage.getItem("usersDetails"));
+        for (const user of usersDetails) {
+            if (user.email === Person.email) {
+                user.photo = base64String;
+                break;
+            }
+        }
+        localStorage.setItem("usersDetails", JSON.stringify(usersDetails));
+    };
+    reader.readAsDataURL(file); // Convert file to Base64
+});
 // Function for top BMES Blocks to show balance,amount etc on boxes
 function getBMES(Person) {
     if (Person.transactions.length === 0) { // If new user login and he do not added any transactions
@@ -38,6 +68,12 @@ function getBMES(Person) {
     userProfileName[0].innerHTML = Person.name;
     userProfileName[1].innerHTML = Person.email;
     userProfileName[2].innerHTML = `Welcome, ${(Person.name).split(" ")[0]}!`;
+    if (Person.photo) {
+        const photoURL = Person.photo;
+        for (let ele of profilePic) {
+            ele.src = Person.photo;
+        }
+    }
     return;
 })();
 // Function when user clicks web icon so the page reloads
@@ -45,20 +81,20 @@ logoBox.addEventListener("click", () => {
     window.location.assign("dashboard.html");
 });
 //Function when user click logout
-logoutBtn[1].addEventListener('click', () => {
+logoutBtn.addEventListener('click', () => {
     sessionStorage.clear();
     window.location.replace("index.html");
     return;
 });
 //Function when user wants to add transaction by clicking transaction button
 transactionBtn.addEventListener("click", () => {
-    const AID = document.querySelectorAll(".add-Transaction");
+    const AITD = document.querySelectorAll(".add-Transaction");
     const tBody = document.querySelector("#table-body");
     let amount;
-    if (Number(AID[0].value) > 0 && AID[1].value !== "Income / Expense" && AID[2].value !== "") {
-        amount = Number(AID[0].value);
+    if (Number(AITD[0].value) > 0 && AITD[1].value !== "Income / Expense" && AITD[2].value !== "Select Type" && AITD[3].value !== "") {
+        amount = Number(AITD[0].value);
         // This is the area that adds the desired transaction added in list -->
-        const transType = AID[1].value;
+        const transType = AITD[1].value;
         let trow = document.createElement("tr");
         let tdes0 = document.createElement("td");
         let tdes1 = document.createElement("td");
@@ -66,13 +102,12 @@ transactionBtn.addEventListener("click", () => {
         let tdes3 = document.createElement("td");
         let tdes4 = document.createElement("td");
         let delbtn = document.createElement("button");
-        tdes0.innerHTML = `${AID[2].value}`;
-        tdes1.innerHTML = `₹ ${AID[0].value}`;
-        tdes2.innerHTML = `Grocies`;
+        tdes0.innerHTML = `${AITD[3].value}`;
+        tdes1.innerHTML = `₹ ${AITD[0].value}`;
+        tdes2.innerHTML = `${AITD[2].value}`;
         tdes3.innerHTML = `${transType}`;
         delbtn.innerHTML = "Delete";
         delbtn.classList.add("delete-btn");
-        // tdes4.appendChild(delbtn);
         tdes4.appendChild(delbtn);
         trow.appendChild(tdes0);
         trow.appendChild(tdes1);
@@ -83,7 +118,8 @@ transactionBtn.addEventListener("click", () => {
         //Addition of the Entered transaction to the Person Object ---->
         const newTransaction = {
             date: tdes0.innerHTML,
-            amount: Number(AID[0].value),
+            amount: Number(AITD[0].value),
+            category: tdes2.innerHTML,
             type: tdes3.innerHTML,
         };
         Person.transactions.push(newTransaction);
@@ -99,9 +135,10 @@ transactionBtn.addEventListener("click", () => {
         }
         localStorage.setItem("usersDetails", JSON.stringify(usersDetails));
         // ---------< Area completed
-        AID[0].value = "";
-        AID[1].value = "Income / Expense";
-        AID[2].value = "";
+        AITD[0].value = "";
+        AITD[1].value = "Income / Expense";
+        AITD[2].value = "Select Type";
+        AITD[3].value = "";
         // ------< Area completed
     }
     return;
@@ -141,11 +178,10 @@ function transactionList(Person) {
         let delbtn = document.createElement("button");
         tdes0.innerHTML = `${data.date}`;
         tdes1.innerHTML = `₹ ${data.amount}`;
-        tdes2.innerHTML = `Grocery`;
+        tdes2.innerHTML = `${data.category}`;
         tdes3.innerHTML = `${data.type}`;
         delbtn.innerHTML = `Delete`;
         delbtn.classList.add("delete-btn");
-        // tdes4.appendChild(delbtn);
         tdes4.appendChild(delbtn);
         trow.appendChild(tdes0);
         trow.appendChild(tdes1);
@@ -162,13 +198,15 @@ body.addEventListener('click', (e) => {
     const target = e.target;
     if (target.classList.contains("delete-btn")) {
         const row = target.closest("tr");
+        console.log(row);
         const date = row.children[0].textContent;
         const amount = row.children[1].textContent;
-        // const category = row.children[2]!.textContent;
+        const category = row.children[2].textContent;
         const type = row.children[3].textContent;
         const tempTransaction = {
             date: date,
             amount: Number(amount.replace("₹", "")),
+            category: category,
             type: type,
         };
         // re-evaluate the amount, savings etc
@@ -182,7 +220,7 @@ body.addEventListener('click', (e) => {
 function reEvaluate(Person, tempTransaction) {
     const arr = Person.transactions;
     for (let i = 0; i < arr.length; i++) {
-        if (arr[i].amount === tempTransaction.amount && arr[i].date === tempTransaction.date && arr[i].type === tempTransaction.type) {
+        if (arr[i].amount === tempTransaction.amount && arr[i].date === tempTransaction.date && arr[i].category === tempTransaction.category && arr[i].type === tempTransaction.type) {
             arr.splice(i, 1);
         }
     }
