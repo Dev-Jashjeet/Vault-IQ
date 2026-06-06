@@ -186,6 +186,7 @@ body {
   font-size: 16px;
   display: flex;
   align-items: center;
+  transition: all 0.3s ease;
 }
 
 /* Cards */
@@ -260,7 +261,7 @@ body {
 
 .add-transaction h2,
 .chart-panel h2,
-.doughnut-panel h2,
+.geminiAI h2,
 .transactions-section h2 {
   font-size: 22px;
   margin-bottom: 20px;
@@ -409,6 +410,21 @@ td {
   justify-content: space-around;
   color: var(--text-soft);
   font-size: 15px;
+}
+
+/* AI text list */
+.list-cont {
+  height: 300px;
+  overflow: scroll;
+}
+
+.geminiAI li {
+  list-style: none;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: #ffff;
+  margin-bottom: 10px;
 }
 
 /* Responsive */
