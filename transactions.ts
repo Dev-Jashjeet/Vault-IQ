@@ -44,6 +44,7 @@ viewAll.addEventListener("click", (): void => {
         btns.classList.remove("active");
     }
     (sidebarsButton[0] as HTMLElement).classList.add("active");
+    transactionListHeight.scrollTop = 0;
     transactionListHeight.style.height = "365px";
     transactionListHeight.style.overflow = "hidden";
     for(let element of transactionBodyElements) {
