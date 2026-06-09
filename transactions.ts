@@ -33,6 +33,7 @@ viewAll.addEventListener("click", (): void => {
     for(let btns of sidebarsButton) {
         btns.classList.remove("active");
     }
+
     (sidebarsButton[1] as HTMLElement).classList.add("active");
     HideShow(click);
     return;
