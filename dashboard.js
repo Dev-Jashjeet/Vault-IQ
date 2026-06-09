@@ -1,3 +1,4 @@
+import getData from "./geminiApi.js";
 const logoBox = document.querySelector(".logo-box");
 const userProfileName = document.querySelectorAll(".userprofile");
 const logoutBtn = document.querySelector(".logout-btn");
@@ -56,6 +57,7 @@ function getBMES(Person) {
     }
     else {
         const calcExpense = calcIncomeExpense(Person);
+        const response = getAIPrompt(calcExpense, Person);
         updateBMES(calcExpense);
     }
     return;
@@ -72,6 +74,14 @@ function getBMES(Person) {
         const photoURL = Person.photo;
         for (let ele of profilePic) {
             ele.src = Person.photo;
+        }
+    }
+    if (Person.gemini_suggestions) {
+        for (let data of Person.gemini_suggestions) {
+            const aiListLabel = document.querySelector(".list-cont");
+            const list = document.createElement("li");
+            list.innerHTML = `${data}`;
+            aiListLabel.appendChild(list);
         }
     }
     return;
@@ -135,6 +145,8 @@ transactionBtn.addEventListener("click", () => {
         }
         localStorage.setItem("usersDetails", JSON.stringify(usersDetails));
         // ---------< Area completed
+        // AI SUGGESTION
+        updateAIRecommendation(Person);
         AITD[0].value = "";
         AITD[1].value = "Income / Expense";
         AITD[2].value = "Select Type";
@@ -198,7 +210,6 @@ body.addEventListener('click', (e) => {
     const target = e.target;
     if (target.classList.contains("delete-btn")) {
         const row = target.closest("tr");
-        console.log(row);
         const date = row.children[0].textContent;
         const amount = row.children[1].textContent;
         const category = row.children[2].textContent;
@@ -226,6 +237,8 @@ function reEvaluate(Person, tempTransaction) {
     }
     Person.transactions = arr;
     getBMES(Person);
+    // ReUpdate gemini AI Suggestion
+    updateAIRecommendation(Person);
     // Local updation to Local Storage --->
     const usersDetails = JSON.parse(localStorage.getItem("usersDetails"));
     for (const user of usersDetails) {
@@ -236,5 +249,59 @@ function reEvaluate(Person, tempTransaction) {
     }
     localStorage.setItem("usersDetails", JSON.stringify(usersDetails));
     // ---------< Area completed
+    return;
+}
+// Function to make prompt for gemini
+function getAIPrompt(data, Person) {
+    const prompt = `
+    Monthly Salary: ${Person.salary}
+    Total Income: ${data.totalIncome}
+    Total Expenditure: ${data.totalExpense}
+    Total Balance Remaining: ${Math.abs(data.totalBalance)}
+
+    Give exactly one financial recommendation that is something based on target like you have
+    you have to do this in a particular day and in upcomming week, also you can consider to 
+    give advice to save how much persentage to go to that target in 5-7 words with words based on salary,
+    income, expenditure, balance remaining only. Also add some attractive emojis in between the text that looks attractive`;
+    return prompt;
+}
+// Function to call Gemini API
+async function updateAIRecommendation(Person) {
+    const moneyData = calcIncomeExpense(Person);
+    const prompt = getAIPrompt(moneyData, Person);
+    const response = await getData(prompt);
+    if (response !== null) {
+        aiSuggestionList(response);
+    }
+    return;
+}
+// Function to add List on gemini AI (Beta) container
+function aiSuggestionList(response) {
+    const aiListLabel = document.querySelector(".list-cont");
+    const list = document.createElement("li");
+    list.innerHTML = `${response}`;
+    aiListLabel.prepend(list);
+    // Adding text into array
+    if (!Person.gemini_suggestions) {
+        const arr = [];
+        arr.unshift(response);
+        Person.gemini_suggestions = arr;
+    }
+    else {
+        const arr = Person.gemini_suggestions;
+        if (arr.length >= 4) {
+            arr.pop();
+        }
+        arr.unshift(response);
+    }
+    //Adding Local Storage
+    let usersDetails = JSON.parse(localStorage.getItem("usersDetails"));
+    for (let user of usersDetails) {
+        if (user.email === Person.email) {
+            user.gemini_suggestions = Person.gemini_suggestions;
+            break;
+        }
+    }
+    localStorage.setItem("usersDetails", JSON.stringify(usersDetails));
     return;
 }
