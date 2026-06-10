@@ -4,7 +4,7 @@ const strPerson: string = localStorage.getItem("usersDetails")!;
 const Persons = JSON.parse(strPerson);
 const sPersonEmail = sessionStorage.getItem("loginemail");
 let Person!: user;
-let Expenses: Array<number> = [0,0,0,0,0,0,0,0,0,0,0,0];
+let Expenses: [number,number,number,number,number,number,number,number,number,number,number,number] = [0,0,0,0,0,0,0,0,0,0,0,0];
 
 for(let user of Persons) {
     if(user.email === sPersonEmail) {
